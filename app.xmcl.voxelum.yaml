@@ -12,7 +12,6 @@ finish-args:
   - --share=network
   - --socket=pulseaudio
   - --socket=x11
-  - --socket=wayland
   - --filesystem=~/.minecraftx:create
   # Mod drag&drop
   - --filesystem=xdg-download:ro
