@@ -7,22 +7,17 @@ base-version: "24.08"
 command: xmcl-wrapper.sh
 finish-args:
   # Basic System Access
+  - --device=all
   - --share=ipc
   - --share=network
-  - --socket=x11
   - --socket=pulseaudio
-  - --env=ALSOFT_PULSE_DEFAULT=1
-  - --env=ALSOFT_DRIVERS=pulse
-  - --device=dri
+  - --socket=x11
   - --filesystem=~/.minecraftx:create
-  - --filesystem=xdg-download
-  # Media & Communication
-  - --filesystem=xdg-run/pipewire-0:ro
+  # Mod drag&drop
+  - --filesystem=xdg-download:ro
+  # allows for discord rpc
+  - --filesystem=xdg-run/app/com.discordapp.Discord:create 
   - --filesystem=xdg-run/discord-ipc-0:ro
-  # System Integration
-  - --talk-name=org.kde.StatusNotifierWatcher
-  - --talk-name=org.freedesktop.secrets
-  - --talk-name=com.feralinteractive.GameMode
   # Electron Settings
   - --env=ELECTRON_ENABLE_STACK_DUMPING=false
   - --env=ELECTRON_ENABLE_LOGGING=false
@@ -32,6 +27,28 @@ cleanup:
   - /lib/pkgconfig
 
 modules:
+  # Might be needed by some Controller mods (see https://github.com/isXander/Controlify/issues/31)
+  - shared-modules/libusb/libusb.json
+
+  # for the in-game narrator
+  - name: flite
+    buildsystem: autotools
+    config-opts:
+      - --enable-shared
+    no-parallel-make: true
+    cleanup:
+      - /bin
+      - /include
+      - '*.a'
+    sources:
+      - type: git
+        url: https://github.com/festvox/flite.git
+        tag: v2.2
+        commit: e9e2e37c329dbe98bfeb27a1828ef9a71fa84f88
+        x-checker-data:
+          type: git
+          tag-pattern: ^v([\d.]+)$
+
   - name: xrandr
     sources:
       - type: archive
@@ -60,10 +77,10 @@ modules:
           - zypak-wrapper /app/opt/xmcl/xmcl --enable-webrtc-pipewire-capturer "$@"
           
       - type: archive
-        url: https://github.com/Voxelum/x-minecraft-launcher/releases/download/v0.51.2/xmcl-0.51.2-x64.tar.xz
-        sha256: 2a7eb14e71386a8c707d673dea875d4d690bd1c11ed852aa2f19c0ed63972586
+        url: https://github.com/Voxelum/x-minecraft-launcher/releases/download/v0.51.3/xmcl-0.51.3-x64.tar.xz
+        sha256: 32cc077617651e55545a1432ba2aaff46026ff90b260a2f8e1a458040f07c3e3
 
       - type: archive
-        url: https://github.com/Voxelum/flatpak-metadata/releases/download/v0.51.2/archive.tar.gz
-        sha256: 0d94519a8d2bc3b24f4852e8966cacfe75f01ba8dc44229091d662abc4deffcb
+        url: https://github.com/Voxelum/flatpak-metadata/releases/download/v0.51.3/archive.tar.gz
+        sha256: 218c6747c5572144fd5804d92cb62abea1ba24571045d61d590bfbe3b3e4a4cd
         dest: metadata
