@@ -77,10 +77,10 @@ modules:
           - zypak-wrapper /app/opt/xmcl/xmcl --enable-webrtc-pipewire-capturer "$@"
           
       - type: archive
-        url: https://github.com/Voxelum/x-minecraft-launcher/releases/download/v0.51.5/xmcl-0.51.5-x64.tar.xz
-        sha256: 958c682bcc2c52fd4a7b562c6b4e2e410d1e4fed3dc27e67b46caeb129b85667
+        url: https://github.com/Voxelum/x-minecraft-launcher/releases/download/v0.51.6/xmcl-0.51.6-x64.tar.xz
+        sha256: e95721a5880940bc32dce52084b761d0557308d746e6cc5d443b36cd4db01492
 
       - type: archive
-        url: https://github.com/Voxelum/flatpak-metadata/releases/download/v0.51.5/archive.tar.gz
-        sha256: ab4c8eeb28381f93fbf67737183c2e5dbe238bd528e7f3f65390c49b4bb8d19c
+        url: https://github.com/Voxelum/flatpak-metadata/releases/download/v0.51.6/archive.tar.gz
+        sha256: ca66f4296e4f795a525eb4211767a2adcdadbbe349ef88fb102a3c6a6e1ae0c6
         dest: metadata
