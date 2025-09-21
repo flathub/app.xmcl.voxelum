@@ -16,7 +16,7 @@ finish-args:
   # Mod drag&drop
   - --filesystem=xdg-download:ro
   # allows for discord rpc
-  - --filesystem=xdg-run/app/com.discordapp.Discord:create 
+  - --filesystem=xdg-run/app/com.discordapp.Discord:create
   - --filesystem=xdg-run/discord-ipc-0:ro
   # Electron Settings
   - --env=ELECTRON_ENABLE_STACK_DUMPING=false
@@ -39,7 +39,7 @@ modules:
     cleanup:
       - /bin
       - /include
-      - '*.a'
+      - "*.a"
     sources:
       - type: git
         url: https://github.com/festvox/flite.git
@@ -75,12 +75,12 @@ modules:
           - export LD_LIBRARY_PATH=/app/opt/xmcl:$LD_LIBRARY_PATH
           - export APPIMAGE=1
           - zypak-wrapper /app/opt/xmcl/xmcl --enable-webrtc-pipewire-capturer "$@"
-          
-      - type: archive
-        url: https://github.com/Voxelum/x-minecraft-launcher/releases/download/v0.51.6/xmcl-0.51.6-x64.tar.xz
-        sha256: e95721a5880940bc32dce52084b761d0557308d746e6cc5d443b36cd4db01492
 
       - type: archive
-        url: https://github.com/Voxelum/flatpak-metadata/releases/download/v0.51.6/archive.tar.gz
-        sha256: ca66f4296e4f795a525eb4211767a2adcdadbbe349ef88fb102a3c6a6e1ae0c6
+        url: https://github.com/Voxelum/x-minecraft-launcher/releases/download/v0.52.0/xmcl-0.52.0-x64.tar.xz
+        sha256: b73c9b5bb02be34b1c3b3d058eba2bbd130109c7d0752ebf78bc8339b546aa81
+
+      - type: archive
+        url: https://github.com/Voxelum/flatpak-metadata/releases/download/v0.52.0/archive.tar.gz
+        sha256: a7b5674f6dc1fc8fd78422b3beda340540981a32a170139ce7bc0116ebb84d5e
         dest: metadata
