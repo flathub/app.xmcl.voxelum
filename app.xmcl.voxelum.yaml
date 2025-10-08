@@ -82,5 +82,5 @@ modules:
 
       - type: archive
         url: https://github.com/Voxelum/flatpak-metadata/releases/download/v0.52.6/archive.tar.gz
-        sha256: 293d0676ec448649ead571891d689be1b3b3c3b7bf8daa7362f3799600e7a8a4
+        sha256: dbd26459e9a56bdb18857704e892f960651ded829455551a7f53f9ab5c7f26c0
         dest: metadata
