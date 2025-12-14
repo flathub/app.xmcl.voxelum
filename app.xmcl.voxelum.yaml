@@ -8,7 +8,6 @@ base-version: "25.08"
 command: xmcl-wrapper.sh
 
 finish-args:
-  # Basic System Access
   - --share=ipc
   - --socket=x11
   - --socket=wayland
@@ -47,7 +46,6 @@ finish-args:
   # Electron settings
   - --env=ELECTRON_ENABLE_STACK_DUMPING=false
   - --env=ELECTRON_ENABLE_LOGGING=false
-  - --env=ELECTRON_OZONE_PLATFORM_HINT=wayland
 
 cleanup:
   - /include
@@ -130,6 +128,7 @@ modules:
   - name: XMCL
     buildsystem: simple
     build-commands:
+      - sed -i 's|^Exec=.*|Exec=xmcl-wrapper.sh %U|' metadata/${FLATPAK_ID}.desktop
       - install -Dm644 metadata/icons/${FLATPAK_ID}.png ${FLATPAK_DEST}/share/icons/hicolor/512x512/apps/${FLATPAK_ID}.png
       - install -Dm644 metadata/${FLATPAK_ID}.desktop ${FLATPAK_DEST}/share/applications/${FLATPAK_ID}.desktop
       - install -Dm644 metadata/${FLATPAK_ID}.metainfo.xml ${FLATPAK_DEST}/share/metainfo/${FLATPAK_ID}.metainfo.xml
@@ -143,9 +142,7 @@ modules:
         dest-filename: xmcl-wrapper.sh
         commands:
           - |
-            # XMCL Flatpak wrapper
-
-            # Library paths - no bundled Java, XMCL downloads what it needs
+            #!/bin/bash
             export LD_LIBRARY_PATH=/app/opt/xmcl:$LD_LIBRARY_PATH
 
             # AppImage compatibility
@@ -154,12 +151,18 @@ modules:
             # Fix audio spatial positioning
             export PULSE_PROP='media.role=game'
 
-            # Launch XMCL with optimizations
-            exec zypak-wrapper /app/opt/xmcl/xmcl \
-              --enable-webrtc-pipewire-capturer \
-              --enable-features=VaapiVideoDecoder,VaapiVideoEncoder \
-              --disable-gpu-driver-bug-workarounds \
-              "$@"
+            ARGS=(
+              "--enable-webrtc-pipewire-capturer"
+              "--enable-features=VaapiVideoDecoder,VaapiVideoEncoder"
+              "--disable-gpu-driver-bug-workarounds"
+            )
+
+            if [[ "$XDG_SESSION_TYPE" == "wayland" ]]; then
+                ARGS+=("--ozone-platform-hint=auto")
+                ARGS+=("--enable-wayland-ime")
+            fi
+
+            exec zypak-wrapper /app/opt/xmcl/xmcl "${ARGS[@]}" "$@"
 
       # Prime-run wrapper for hybrid graphics (AMD/NVIDIA)
       - type: script
