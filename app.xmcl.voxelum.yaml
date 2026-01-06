@@ -1,24 +1,47 @@
 app-id: app.xmcl.voxelum
 runtime: org.freedesktop.Platform
-runtime-version: "24.08"
+runtime-version: "25.08"
 sdk: org.freedesktop.Sdk
 base: org.electronjs.Electron2.BaseApp
-base-version: "24.08"
+base-version: "25.08"
+
 command: xmcl-wrapper.sh
+
 finish-args:
-  # Basic System Access
-  - --device=all
   - --share=ipc
+  - --socket=x11
+  - --device=all
   - --share=network
   - --socket=pulseaudio
-  - --socket=x11
+
+  # System tray / AppIndicator support
+  - --talk-name=org.kde.StatusNotifierWatcher
+  - --talk-name=org.freedesktop.Notifications
+
+  # Fix audio spatial positioning
+  - --env=PULSE_PROP=media.role=game
+  - --env=PULSE_LATENCY_MSEC=60
+
+  # Minecraft data directories
   - --filesystem=~/.minecraftx:create
-  # Mod drag&drop
+  - --filesystem=~/.minecraft:create
+
+  # Mod drag & drop
   - --filesystem=xdg-download:ro
-  # allows for discord rpc
+
+  # Discord RPC support
   - --filesystem=xdg-run/app/com.discordapp.Discord:create
   - --filesystem=xdg-run/discord-ipc-0:ro
-  # Electron Settings
+
+  # Userspace visibility for manual hugepages configuration
+  # Required for -XX:+UseLargePages
+  - --filesystem=/sys/kernel/mm/hugepages:ro
+
+  # Userspace visibility for transparent hugepages configuration
+  # Required for -XX:+UseTransparentHugePages
+  - --filesystem=/sys/kernel/mm/transparent_hugepage:ro
+
+  # Electron settings
   - --env=ELECTRON_ENABLE_STACK_DUMPING=false
   - --env=ELECTRON_ENABLE_LOGGING=false
 
@@ -27,10 +50,10 @@ cleanup:
   - /lib/pkgconfig
 
 modules:
-  # Might be needed by some Controller mods (see https://github.com/isXander/Controlify/issues/31)
+  # Controller support (needed by some mods like Controlify)
   - shared-modules/libusb/libusb.json
 
-  # for the in-game narrator
+  # In-game narrator support (Text to Speech)
   - name: flite
     buildsystem: autotools
     config-opts:
@@ -50,6 +73,7 @@ modules:
           tag-pattern: ^v([\d.]+)$
 
   - name: xrandr
+    buildsystem: autotools
     sources:
       - type: archive
         url: https://xorg.freedesktop.org/archive/individual/app/xrandr-1.5.3.tar.xz
@@ -58,13 +82,56 @@ modules:
       - /share/man
       - /bin/xkeystone
 
+  # GameMode for performance optimization
+  - name: gamemode
+    buildsystem: meson
+    config-opts:
+      - -Dwith-sd-bus-provider=no-daemon
+      - -Dwith-examples=false
+    post-install:
+      - install -Dm755 ../data/gamemoderun -t /app/bin
+    sources:
+      - type: archive
+        dest-filename: gamemode.tar.gz
+        url: https://api.github.com/repos/FeralInteractive/gamemode/tarball/1.8.2
+        sha256: 2886d4ce543c78bd2a364316d5e7fd59ef06b71de63f896b37c6d3dc97658f60
+    cleanup:
+      - /include
+      - /lib/pkgconfig
+      - /lib/libgamemodeauto.a
+
+  # glxinfo for OpenGL diagnostics
+  - name: glxinfo
+    buildsystem: meson
+    config-opts:
+      - --bindir=/app/mesa-demos
+      - -Degl=disabled
+      - -Dglut=disabled
+      - -Dosmesa=disabled
+      - -Dvulkan=disabled
+      - -Dwayland=disabled
+    post-install:
+      - mv -v /app/mesa-demos/glxinfo /app/bin
+    sources:
+      - type: archive
+        url: https://archive.mesa3d.org/demos/mesa-demos-9.0.0.tar.xz
+        sha256: 3046a3d26a7b051af7ebdd257a5f23bfeb160cad6ed952329cdff1e9f1ed496b
+    cleanup:
+      - /include
+      - /mesa-demos
+      - /share
+    modules:
+      - shared-modules/glu/glu-9.json
+
   - name: XMCL
     buildsystem: simple
     build-commands:
+      - sed -i 's|^Exec=.*|Exec=xmcl-wrapper.sh %U|' metadata/${FLATPAK_ID}.desktop
       - install -Dm644 metadata/icons/${FLATPAK_ID}.png ${FLATPAK_DEST}/share/icons/hicolor/512x512/apps/${FLATPAK_ID}.png
       - install -Dm644 metadata/${FLATPAK_ID}.desktop ${FLATPAK_DEST}/share/applications/${FLATPAK_ID}.desktop
       - install -Dm644 metadata/${FLATPAK_ID}.metainfo.xml ${FLATPAK_DEST}/share/metainfo/${FLATPAK_ID}.metainfo.xml
       - install -Dm755 xmcl-wrapper.sh ${FLATPAK_DEST}/bin/xmcl-wrapper.sh
+      - install -Dm755 prime-run ${FLATPAK_DEST}/bin/prime-run
       - install -d ${FLATPAK_DEST}/opt/xmcl
       - cp -ra * ${FLATPAK_DEST}/opt/xmcl/
       - chmod +x /app/opt/xmcl/xmcl
@@ -72,15 +139,59 @@ modules:
       - type: script
         dest-filename: xmcl-wrapper.sh
         commands:
-          - export LD_LIBRARY_PATH=/app/opt/xmcl:$LD_LIBRARY_PATH
-          - export APPIMAGE=1
-          - zypak-wrapper /app/opt/xmcl/xmcl --enable-webrtc-pipewire-capturer "$@"
+          - |
+            #!/bin/bash
+            export LD_LIBRARY_PATH=/app/opt/xmcl:$LD_LIBRARY_PATH
 
-      - type: archive
-        url: https://github.com/Voxelum/x-minecraft-launcher/releases/download/v0.52.7/xmcl-0.52.7-x64.tar.xz
-        sha256: cf26709e533c076ef083e9da5b805038530fed012759af27f778e63be1c6c3ae
+            # AppImage compatibility
+            export APPIMAGE=1
 
+            # Fix audio spatial positioning
+            export PULSE_PROP='media.role=game'
+
+            ARGS=(
+              "--enable-webrtc-pipewire-capturer"
+              "--enable-features=VaapiVideoDecoder,VaapiVideoEncoder"
+              "--disable-gpu-driver-bug-workarounds"
+            )
+
+            if [[ "$XDG_SESSION_TYPE" == "wayland" ]]; then
+                ARGS+=("--ozone-platform-hint=auto")
+                ARGS+=("--enable-wayland-ime")
+            fi
+
+            exec zypak-wrapper /app/opt/xmcl/xmcl "${ARGS[@]}" "$@"
+
+      # Prime-run wrapper for hybrid graphics (AMD/NVIDIA)
+      - type: script
+        dest-filename: prime-run
+        commands:
+          - |
+            #!/bin/bash
+            # Improved prime-run for hybrid graphics
+            # Detects and uses discrete GPU automatically
+
+            # Check for NVIDIA
+            if command -v nvidia-smi &> /dev/null; then
+                export __NV_PRIME_RENDER_OFFLOAD=1
+                export __GLX_VENDOR_LIBRARY_NAME=nvidia
+                export __VK_LAYER_NV_optimus=NVIDIA_only
+            fi
+
+            # Check for AMD
+            if lspci | grep -i 'vga.*amd' &> /dev/null; then
+                export DRI_PRIME=1
+            fi
+
+            exec "$@"
+
+      # Latest XMCL release
       - type: archive
-        url: https://github.com/Voxelum/flatpak-metadata/releases/download/v0.52.7/archive.tar.gz
-        sha256: db873958c0ffa82cc251c53c4248e43849de082b93045056109df13d917f5515
+        url: https://github.com/Voxelum/x-minecraft-launcher/releases/download/v0.53.3/xmcl-0.53.3-x64.tar.xz
+        sha256: 6a6256209f835b357b80238f8421f583970624be5a5f4bb4e681341d5d977028
+
+      # Flatpak metadata (icons, desktop file, appdata)
+      - type: archive
+        url: https://github.com/Voxelum/flatpak-metadata/releases/download/v0.53.3/archive.tar.gz
+        sha256: 1e85ca6ed00d20b3748bf8c4ceb8983b5e9b3e4bb9c755fce1551f9e61d4fd0d
         dest: metadata
