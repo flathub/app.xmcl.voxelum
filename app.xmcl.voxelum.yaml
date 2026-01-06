@@ -189,11 +189,11 @@ modules:
 
       # Latest XMCL release
       - type: archive
-        url: https://github.com/Voxelum/x-minecraft-launcher/releases/download/v0.53.1/xmcl-0.53.1-x64.tar.xz
-        sha256: 429c006d7a067000188c84e741bd6fb0bc62ef22829e519fa160b67b3e8cc827
+        url: https://github.com/Voxelum/x-minecraft-launcher/releases/download/v0.53.3/xmcl-0.53.3-x64.tar.xz
+        sha256: 6a6256209f835b357b80238f8421f583970624be5a5f4bb4e681341d5d977028
 
       # Flatpak metadata (icons, desktop file, appdata)
       - type: archive
-        url: https://github.com/Voxelum/flatpak-metadata/releases/download/v0.52.7/archive.tar.gz
-        sha256: db873958c0ffa82cc251c53c4248e43849de082b93045056109df13d917f5515
+        url: https://github.com/Voxelum/flatpak-metadata/releases/download/v0.53.3/archive.tar.gz
+        sha256: 1e85ca6ed00d20b3748bf8c4ceb8983b5e9b3e4bb9c755fce1551f9e61d4fd0d
         dest: metadata
