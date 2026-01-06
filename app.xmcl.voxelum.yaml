@@ -9,7 +9,6 @@ command: xmcl-wrapper.sh
 
 finish-args:
   - --share=ipc
-  - --socket=x11
   - --socket=wayland
   - --device=all
   - --share=network
@@ -18,7 +17,6 @@ finish-args:
   # System tray / AppIndicator support
   - --talk-name=org.kde.StatusNotifierWatcher
   - --talk-name=org.freedesktop.Notifications
-  - --own-name=org.kde.*
 
   # Fix audio spatial positioning
   - --env=PULSE_PROP=media.role=game
