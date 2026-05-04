@@ -9,9 +9,7 @@ command: xmcl-wrapper.sh
 
 finish-args:
   - --share=ipc
-  - --socket=wayland
-  - --nosocket=wayland
-  - --socket=fallback-x11
+  - --socket=x11
   - --device=all
   - --share=network
   - --socket=pulseaudio
