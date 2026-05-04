@@ -9,7 +9,6 @@ command: xmcl-wrapper.sh
 
 finish-args:
   - --share=ipc
-  - --socket=wayland
   - --socket=fallback-x11
   - --device=all
   - --share=network
@@ -22,6 +21,9 @@ finish-args:
   # Fix audio spatial positioning
   - --env=PULSE_PROP=media.role=game
   - --env=PULSE_LATENCY_MSEC=60
+
+  # Additional Audio Fix
+  - --filesystem=xdg-run/pipewire-0
 
   # Minecraft data directories
   - --filesystem=~/.minecraftx:create
