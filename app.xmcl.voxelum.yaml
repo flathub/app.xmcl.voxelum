@@ -196,5 +196,5 @@ modules:
       # Flatpak metadata (icons, desktop file, appdata)
       - type: archive
         url: https://github.com/Voxelum/flatpak-metadata/releases/download/v0.61.0/archive.tar.gz
-        sha256: 1f0940479413a3361fa64604d6ee42f7d7a25f4cd1e3ca9d5d54ae62d509ec25
+        sha256: 65beb92de7143de88b41161ed9cedc735026c34ab2b95d629529e8ff88972772
         dest: metadata
