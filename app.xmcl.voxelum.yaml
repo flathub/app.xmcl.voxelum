@@ -40,9 +40,6 @@ finish-args:
   # Gamepad / Controller udev identification (Controlify, MidnightControls)
   - --filesystem=/run/udev:ro
 
-  # MangoHud performance overlay config
-  - --filesystem=xdg-config/MangoHud:ro
-
   # Discord RPC support (Discord, Vesktop, Vencord, WebCord)
   - --filesystem=xdg-run/app/com.discordapp.Discord:create
   - --filesystem=xdg-run/app/dev.vencord.Vencord:create
