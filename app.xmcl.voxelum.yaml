@@ -14,7 +14,6 @@ finish-args:
   - --device=all
   - --share=network
   - --socket=pulseaudio
-  - --socket=pipewire
 
   # System tray / AppIndicator support
   - --talk-name=org.kde.StatusNotifierWatcher
