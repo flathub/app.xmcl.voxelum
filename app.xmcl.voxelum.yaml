@@ -9,14 +9,19 @@ command: xmcl-wrapper.sh
 
 finish-args:
   - --share=ipc
-  - --socket=x11
+  - --socket=wayland
+  - --socket=fallback-x11
   - --device=all
   - --share=network
   - --socket=pulseaudio
+  - --socket=pipewire
 
   # System tray / AppIndicator support
   - --talk-name=org.kde.StatusNotifierWatcher
   - --talk-name=org.freedesktop.Notifications
+
+  # Feral GameMode D-Bus integration
+  - --talk-name=com.feralinteractive.GameMode
 
   # Fix audio spatial positioning
   - --env=PULSE_PROP=media.role=game
@@ -32,9 +37,17 @@ finish-args:
   # Mod drag & drop
   - --filesystem=xdg-download:ro
 
-  # Discord RPC support
+  # Gamepad / Controller udev identification (Controlify, MidnightControls)
+  - --filesystem=/run/udev:ro
+
+  # MangoHud performance overlay config
+  - --filesystem=xdg-config/MangoHud:ro
+
+  # Discord RPC support (Discord, Vesktop, Vencord, WebCord)
   - --filesystem=xdg-run/app/com.discordapp.Discord:create
-  - --filesystem=xdg-run/discord-ipc-0:ro
+  - --filesystem=xdg-run/app/dev.vencord.Vencord:create
+  - --filesystem=xdg-run/app/io.github.spacingbat3.webcord:create
+  - --filesystem=xdg-run/discord-ipc-*:ro
 
   # Userspace visibility for manual hugepages configuration
   # Required for -XX:+UseLargePages
