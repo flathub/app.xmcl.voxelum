@@ -1,9 +1,9 @@
 app-id: app.xmcl.voxelum
 runtime: org.freedesktop.Platform
-runtime-version: "25.08"
+runtime-version: '25.08'
 sdk: org.freedesktop.Sdk
 base: org.electronjs.Electron2.BaseApp
-base-version: "25.08"
+base-version: '25.08'
 
 command: xmcl-wrapper.sh
 
@@ -74,7 +74,7 @@ modules:
     cleanup:
       - /bin
       - /include
-      - "*.a"
+      - '*.a'
     sources:
       - type: git
         url: https://github.com/festvox/flite.git
@@ -199,18 +199,19 @@ modules:
 
       # Latest XMCL release
       - type: archive
-        url: https://github.com/Voxelum/x-minecraft-launcher/releases/download/v0.63.0/xmcl-0.63.0-x64.tar.xz
-        sha256: 37b29529703535e10b697401f63cd9c7bb4a4712ee95e53adfb505fdcf74b688
+        url: https://github.com/Voxelum/x-minecraft-launcher/releases/download/v0.63.2/xmcl-0.63.2-x64.tar.xz
+        sha256: ba6df8ac34e0508313f6abcc95f9b34341b0f1e604b571a69ce6a39e29f84509
         x-checker-data:
           type: json
           url: https://api.github.com/repos/Voxelum/x-minecraft-launcher/releases/latest
           version-query: .tag_name | sub("^v"; "")
-          url-query: .assets[] | select(.name | test("^xmcl-[0-9.]+-x64\\.tar\\.xz$")) | .browser_download_url
+          url-query: .assets[] | select(.name | test("^xmcl-[0-9.]+-x64\\.tar\\.xz$"))
+            | .browser_download_url
 
       # Flatpak metadata (icons, desktop file, appdata)
       - type: archive
-        url: https://github.com/Voxelum/flatpak-metadata/releases/download/v0.63.0/archive.tar.gz
-        sha256: 77c529ff1346a61d18f3acd1cf1baa60f70637aa2cedf04d4c29134d01a41f0c
+        url: https://github.com/Voxelum/flatpak-metadata/releases/download/v0.63.2/archive.tar.gz
+        sha256: 4390371944fa02a54d9b1cf9e1be0bca0a6758f3f93787f846e6f3136e87f996
         dest: metadata
         x-checker-data:
           type: json
