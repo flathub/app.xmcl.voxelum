@@ -9,6 +9,8 @@ command: xmcl-wrapper.sh
 
 finish-args:
   - --share=ipc
+  # X11 & Wayland sockets (Required for Minecraft/LWJGL and Electron)
+  - --socket=x11
   - --socket=fallback-x11
   - --socket=wayland
   - --device=all
@@ -160,6 +162,15 @@ modules:
 
             # Fix audio spatial positioning
             export PULSE_PROP='media.role=game'
+
+            # Ensure DISPLAY is set for Minecraft (LWJGL) under Wayland/Xwayland
+            if [ -z "$DISPLAY" ]; then
+                if [ -e "/tmp/.X11-unix/X0" ]; then
+                    export DISPLAY=:0
+                elif [ -e "/tmp/.X11-unix/X1" ]; then
+                    export DISPLAY=:1
+                fi
+            fi
 
             ARGS=(
               "--enable-webrtc-pipewire-capturer"
