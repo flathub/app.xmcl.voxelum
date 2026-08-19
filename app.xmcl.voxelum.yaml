@@ -9,8 +9,8 @@ command: xmcl-wrapper.sh
 
 finish-args:
   - --share=ipc
-  - --socket=fallback-x11
   - --socket=wayland
+  - --socket=fallback-x11
   - --device=all
   - --share=network
   - --socket=pulseaudio
@@ -160,6 +160,15 @@ modules:
 
             # Fix audio spatial positioning
             export PULSE_PROP='media.role=game'
+
+            # Ensure DISPLAY is set for Minecraft (LWJGL) under Wayland/Xwayland
+            if [ -z "$DISPLAY" ]; then
+                if [ -e "/tmp/.X11-unix/X0" ]; then
+                    export DISPLAY=:0
+                elif [ -e "/tmp/.X11-unix/X1" ]; then
+                    export DISPLAY=:1
+                fi
+            fi
 
             ARGS=(
               "--enable-webrtc-pipewire-capturer"
